@@ -3,6 +3,7 @@ package ch.zhaw.gpi.publfoerderung;
 import org.camunda.bpm.spring.boot.starter.annotation.EnableProcessApplication;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.PropertySource;
 
 /**
  * Hauptklasse für die Prozessapplikation, welche diese mit allen Abhängigkeiten
@@ -20,6 +21,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 @EnableProcessApplication
+@PropertySource("classpath:mail.properties")
 public class CamundaProcessApplication {
 
     /**

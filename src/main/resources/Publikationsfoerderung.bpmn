@@ -7,9 +7,9 @@
     <bpmn:messageFlow id="MessageFlow_1mgh536" sourceRef="Task_AntragsformularAusfullen" targetRef="StartEvent_AntragsformularEingereicht" />
     <bpmn:messageFlow id="MessageFlow_1xw6b15" sourceRef="EndEvent_AblehnenderEntscheidMitgeteilt" targetRef="IntermediateCatchEvent_NegativerEntscheidErhalten" />
     <bpmn:messageFlow id="MessageFlow_1a2a98x" sourceRef="EndEvent_PositiverEnscheidMitgeteilt" targetRef="IntermediateCatchEvent_PositiverEntscheidErhalten" />
-    <bpmn:messageFlow id="MessageFlow_1nfnj5x" sourceRef="Task_AntragPrufen" targetRef="StartEvent_AntragEingetroffen" />
-    <bpmn:messageFlow id="MessageFlow_01q9y2r" sourceRef="Task_AntragPrufen" targetRef="Task_AntragInhaltlichBegutachten" />
-    <bpmn:messageFlow id="MessageFlow_0jg6cax" sourceRef="Task_PrufergebnisFesthalten" targetRef="Task_AntragPrufen" />
+    <bpmn:messageFlow id="MessageFlow_1nfnj5x" sourceRef="UserTask_AntragPrufen" targetRef="StartEvent_AntragEingetroffen" />
+    <bpmn:messageFlow id="MessageFlow_01q9y2r" sourceRef="UserTask_AntragPrufen" targetRef="Task_AntragInhaltlichBegutachten" />
+    <bpmn:messageFlow id="MessageFlow_0jg6cax" sourceRef="Task_PrufergebnisFesthalten" targetRef="UserTask_AntragPrufen" />
   </bpmn:collaboration>
   <bpmn:process id="Process_1n0y0zx" isExecutable="false">
     <bpmn:laneSet id="LaneSet_0l4ow27">
@@ -145,32 +145,34 @@
         <bpmn:flowNodeRef>ExclusiveGateway_Score</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>ExclusiveGateway_1x60s1f</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>ExclusiveGateway_Prufentscheid</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>EndEvent_PositiverEnscheidMitgeteilt</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ScriptTask_MetadatenZuReferenzpaperSuchen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ServiceTask_AACSBRatingDesJournalsErmitteln</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BusinessRuleTask_ScoreDesAntragsErmitteln</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_ErinnerungGesendet</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>EndEvent_AblehnenderEntscheidMitgeteilt</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Task_MetadatenZuReferenzpaperSuchen</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Task_AACSBRatingDesJournalsErmitteln</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Task_ScoreDesAntragsErmitteln</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_PositiverEnscheidMitgeteilt</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="Lane_Stab" name="Stab">
-        <bpmn:flowNodeRef>Task_AntragPrufen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>UserTask_AntragPrufen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BoundaryEvent_3TageAbgelaufen</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
-    <bpmn:sequenceFlow id="SequenceFlow_0qmi2y6" sourceRef="StartEvent_AntragsformularEingereicht" targetRef="Task_MetadatenZuReferenzpaperSuchen" />
-    <bpmn:sequenceFlow id="SequenceFlow_164geph" sourceRef="Task_MetadatenZuReferenzpaperSuchen" targetRef="Task_AACSBRatingDesJournalsErmitteln" />
-    <bpmn:sequenceFlow id="SequenceFlow_1wdydgz" sourceRef="Task_AACSBRatingDesJournalsErmitteln" targetRef="Task_ScoreDesAntragsErmitteln" />
+    <bpmn:sequenceFlow id="SequenceFlow_0qmi2y6" sourceRef="StartEvent_AntragsformularEingereicht" targetRef="ScriptTask_MetadatenZuReferenzpaperSuchen" />
+    <bpmn:sequenceFlow id="SequenceFlow_164geph" sourceRef="ScriptTask_MetadatenZuReferenzpaperSuchen" targetRef="ServiceTask_AACSBRatingDesJournalsErmitteln" />
+    <bpmn:sequenceFlow id="SequenceFlow_1wdydgz" sourceRef="ServiceTask_AACSBRatingDesJournalsErmitteln" targetRef="BusinessRuleTask_ScoreDesAntragsErmitteln" />
     <bpmn:exclusiveGateway id="ExclusiveGateway_Score" name="Score?">
       <bpmn:incoming>SequenceFlow_16cpse5</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_4</bpmn:outgoing>
       <bpmn:outgoing>SequenceFlow_41</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="SequenceFlow_16cpse5" sourceRef="Task_ScoreDesAntragsErmitteln" targetRef="ExclusiveGateway_Score" />
+    <bpmn:sequenceFlow id="SequenceFlow_16cpse5" sourceRef="BusinessRuleTask_ScoreDesAntragsErmitteln" targetRef="ExclusiveGateway_Score" />
     <bpmn:sequenceFlow id="SequenceFlow_4" name="&#60; 4" sourceRef="ExclusiveGateway_Score" targetRef="ExclusiveGateway_1x60s1f">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${score&lt;4}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="SequenceFlow_41" name="&#62;= 4" sourceRef="ExclusiveGateway_Score" targetRef="Task_AntragPrufen">
+    <bpmn:sequenceFlow id="SequenceFlow_41" name="&#62;= 4" sourceRef="ExclusiveGateway_Score" targetRef="UserTask_AntragPrufen">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${score&gt;=4}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="SequenceFlow_01gbmrh" sourceRef="Task_AntragPrufen" targetRef="ExclusiveGateway_Prufentscheid" />
+    <bpmn:sequenceFlow id="SequenceFlow_01gbmrh" sourceRef="UserTask_AntragPrufen" targetRef="ExclusiveGateway_Prufentscheid" />
     <bpmn:startEvent id="StartEvent_AntragsformularEingereicht" name="Antragsformular eingereicht" camunda:asyncAfter="true" camunda:initiator="${applicant}">
       <bpmn:extensionElements>
         <camunda:formData>
@@ -195,9 +197,6 @@
       <bpmn:outgoing>SequenceFlow_Positiv1</bpmn:outgoing>
       <bpmn:outgoing>SequenceFlow_Negativ1</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:endEvent id="EndEvent_PositiverEnscheidMitgeteilt" name="Positiver Enscheid mitgeteilt">
-      <bpmn:incoming>SequenceFlow_Positiv1</bpmn:incoming>
-    </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_Negativ1" name="Negativ" sourceRef="ExclusiveGateway_Prufentscheid" targetRef="ExclusiveGateway_1x60s1f">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!decision}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
@@ -205,10 +204,7 @@
     <bpmn:sequenceFlow id="SequenceFlow_Positiv1" name="Positiv" sourceRef="ExclusiveGateway_Prufentscheid" targetRef="EndEvent_PositiverEnscheidMitgeteilt">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${decision}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:endEvent id="EndEvent_AblehnenderEntscheidMitgeteilt" name="Ablehnender Entscheid mitgeteilt">
-      <bpmn:incoming>SequenceFlow_1p9ep4j</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:userTask id="Task_AntragPrufen" name="Antrag prüfen" camunda:asyncAfter="true" camunda:candidateGroups="stab">
+    <bpmn:userTask id="UserTask_AntragPrufen" name="Antrag prüfen" camunda:asyncAfter="true" camunda:candidateGroups="stab">
       <bpmn:extensionElements>
         <camunda:formData>
           <camunda:formField id="authorFirstName" label="Autor Vorname" type="string">
@@ -268,20 +264,39 @@
       <bpmn:incoming>SequenceFlow_41</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_01gbmrh</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:scriptTask id="Task_MetadatenZuReferenzpaperSuchen" name="Metadaten zu Referenzpaper suchen" scriptFormat="JavaScript">
+    <bpmn:scriptTask id="ScriptTask_MetadatenZuReferenzpaperSuchen" name="Metadaten zu Referenzpaper suchen" scriptFormat="JavaScript">
       <bpmn:incoming>SequenceFlow_0qmi2y6</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_164geph</bpmn:outgoing>
       <bpmn:script>execution.setVariable("refPaperTitle", "Auswirkungen des Moduls Geschäftsprozessintegration auf die mentale Gesundheit von Studierenden");
 execution.setVariable("refPaperAbstract", "Lorem ipsum ...");</bpmn:script>
     </bpmn:scriptTask>
-    <bpmn:serviceTask id="Task_AACSBRatingDesJournalsErmitteln" name="AACSB-Rating des Journals ermitteln" camunda:delegateExpression="${getJournalRatingAdapter}">
+    <bpmn:serviceTask id="ServiceTask_AACSBRatingDesJournalsErmitteln" name="AACSB-Rating des Journals ermitteln" camunda:delegateExpression="${getJournalRatingAdapter}">
       <bpmn:incoming>SequenceFlow_164geph</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1wdydgz</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:businessRuleTask id="Task_ScoreDesAntragsErmitteln" name="Score des Antrags ermitteln" camunda:resultVariable="score" camunda:decisionRef="scoreDecision" camunda:mapDecisionResult="singleEntry">
+    <bpmn:businessRuleTask id="BusinessRuleTask_ScoreDesAntragsErmitteln" name="Score des Antrags ermitteln" camunda:resultVariable="score" camunda:decisionRef="scoreDecision" camunda:mapDecisionResult="singleEntry">
       <bpmn:incoming>SequenceFlow_1wdydgz</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_16cpse5</bpmn:outgoing>
     </bpmn:businessRuleTask>
+    <bpmn:boundaryEvent id="BoundaryEvent_3TageAbgelaufen" name="3 Tage abgelaufen" cancelActivity="false" attachedToRef="UserTask_AntragPrufen">
+      <bpmn:outgoing>SequenceFlow_0xcif4x</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P3D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0xcif4x" sourceRef="BoundaryEvent_3TageAbgelaufen" targetRef="EndEvent_ErinnerungGesendet" />
+    <bpmn:endEvent id="EndEvent_ErinnerungGesendet" name="Erinnerung gesendet">
+      <bpmn:incoming>SequenceFlow_0xcif4x</bpmn:incoming>
+      <bpmn:messageEventDefinition camunda:delegateExpression="${sendReminderAdapter}" />
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEvent_AblehnenderEntscheidMitgeteilt" name="Ablehnender Entscheid mitgeteilt">
+      <bpmn:incoming>SequenceFlow_1p9ep4j</bpmn:incoming>
+      <bpmn:messageEventDefinition camunda:delegateExpression="${sendDecisionAdapter}" />
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEvent_PositiverEnscheidMitgeteilt" name="Positiver Enscheid mitgeteilt">
+      <bpmn:incoming>SequenceFlow_Positiv1</bpmn:incoming>
+      <bpmn:messageEventDefinition camunda:delegateExpression="${sendDecisionAdapter}" />
+    </bpmn:endEvent>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1cnfcp8">
@@ -520,12 +535,6 @@ execution.setVariable("refPaperAbstract", "Lorem ipsum ...");</bpmn:script>
           <dc:Bounds x="876" y="748" width="17" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="EndEvent_0tz8aix_di" bpmnElement="EndEvent_AblehnenderEntscheidMitgeteilt">
-        <dc:Bounds x="1200" y="748" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1187" y="791" width="63" height="40" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1p9ep4j_di" bpmnElement="SequenceFlow_1p9ep4j">
         <di:waypoint x="1019" y="766" />
         <di:waypoint x="1200" y="766" />
@@ -549,12 +558,6 @@ execution.setVariable("refPaperAbstract", "Lorem ipsum ...");</bpmn:script>
         <di:waypoint x="994" y="1021" />
         <di:waypoint x="994" y="908" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="EndEvent_0dcip6s_di" bpmnElement="EndEvent_PositiverEnscheidMitgeteilt">
-        <dc:Bounds x="1132" y="865" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1127" y="908" width="46" height="40" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0yed0xt_di" bpmnElement="SequenceFlow_Positiv1">
         <di:waypoint x="1019" y="883" />
         <di:waypoint x="1132" y="883" />
@@ -605,17 +608,45 @@ execution.setVariable("refPaperAbstract", "Lorem ipsum ...");</bpmn:script>
         <di:waypoint x="902" y="1104" />
         <di:waypoint x="902" y="1061" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="UserTask_1kb3nm1_di" bpmnElement="Task_AntragPrufen">
+      <bpmndi:BPMNShape id="UserTask_1kb3nm1_di" bpmnElement="UserTask_AntragPrufen">
         <dc:Bounds x="835" y="981" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ScriptTask_0ou2dsu_di" bpmnElement="Task_MetadatenZuReferenzpaperSuchen">
+      <bpmndi:BPMNShape id="ScriptTask_0ou2dsu_di" bpmnElement="ScriptTask_MetadatenZuReferenzpaperSuchen">
         <dc:Bounds x="323" y="726" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ServiceTask_0f1ij8x_di" bpmnElement="Task_AACSBRatingDesJournalsErmitteln">
+      <bpmndi:BPMNShape id="ServiceTask_0f1ij8x_di" bpmnElement="ServiceTask_AACSBRatingDesJournalsErmitteln">
         <dc:Bounds x="465" y="726" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BusinessRuleTask_00w8wdf_di" bpmnElement="Task_ScoreDesAntragsErmitteln">
+      <bpmndi:BPMNShape id="BusinessRuleTask_00w8wdf_di" bpmnElement="BusinessRuleTask_ScoreDesAntragsErmitteln">
         <dc:Bounds x="607" y="726" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryEvent_0fkh40t_di" bpmnElement="BoundaryEvent_3TageAbgelaufen">
+        <dc:Bounds x="882" y="963" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="823" y="946" width="55" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0xcif4x_di" bpmnElement="SequenceFlow_0xcif4x">
+        <di:waypoint x="900" y="963" />
+        <di:waypoint x="900" y="937" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1jgqq4n_di" bpmnElement="EndEvent_ErinnerungGesendet">
+        <dc:Bounds x="882" y="901" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="873" y="871" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0octkev_di" bpmnElement="EndEvent_AblehnenderEntscheidMitgeteilt">
+        <dc:Bounds x="1200" y="748" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1187" y="791" width="63" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_06dekqh_di" bpmnElement="EndEvent_PositiverEnscheidMitgeteilt">
+        <dc:Bounds x="1132" y="865" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1127" y="908" width="46" height="40" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
